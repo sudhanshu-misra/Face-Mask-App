@@ -4,15 +4,16 @@ import tensorflow as tf
 import numpy as np
 from PIL import Image
 
+# Load model once
 @st.cache_resource
 def load_my_model():
     BASE_DIR = os.path.dirname(__file__)
-    model_path = os.path.join(BASE_DIR, "mask_detector.h5")
+    model_path = os.path.join(BASE_DIR, "mask_detector.keras") 
     return tf.keras.models.load_model(model_path, compile=False)
 
 model = load_my_model()
 
-# Only 3 classes needed
+# Only 3 classes
 class_names = ["With Mask", "Without Mask", "Mask Worn Incorrectly"]
 
 st.title("😷 Face Mask Detection System")
@@ -20,12 +21,10 @@ st.write("Upload an image to check mask status")
 
 uploaded_file = st.file_uploader("Choose an image", type=["jpg", "png", "jpeg"])
 
-if uploaded_file is not None:
+if uploaded_file:
     try:
-        # Read image
+        # Open and convert image
         img = Image.open(uploaded_file)
-
-        # Convert to RGB
         if img.mode != "RGB":
             img = img.convert("RGB")
 
@@ -45,7 +44,7 @@ if uploaded_file is not None:
             pred_class = int(np.argmax(result))
             confidence = float(np.max(result))
 
-        # Display
+        # Display results
         col1, col2 = st.columns(2)
 
         with col1:
